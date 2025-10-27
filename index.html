@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบค้นหาข้อมูลสมาชิก ศพก.ทบ.รามอินทรา (ผ่าน Google Drive)</title>
+    <style>
+        body { font-family: Tahoma, sans-serif; margin: 20px; background-color: #f4f4f4; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); border-radius: 8px; }
+        h1 { text-align: center; color: #333; }
+        #searchInput { width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; box-sizing: border-box; }
+        #resultTable { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        #resultTable th, #resultTable td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        #resultTable th { background-color: #007bff; color: white; }
+        #resultTable tr:nth-child(even) { background-color: #f9f9f9; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>ระบบค้นหาข้อมูลสมาชิก ศพก.ทบ.รามอินทรา</h1>
+        
+        <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="ค้นหา ชื่อ หรือ นามสกุล..." disabled>
+
+        <table id="resultTable">
+            <thead>
+                <tr>
+                    <th>ยศ</th>
+                    <th>ชื่อ</th>
+                    <th>นามสกุล</th>
+                    <th>ประเภท</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr><td colspan="4" style="text-align: center;">กำลังโหลดข้อมูลจาก Google Drive...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const tableBody = document.getElementById('tableBody');
+        let globalData = []; 
+
+        // !!! สำคัญ: ต้องใส่ URL สาธารณะของไฟล์ data.json ที่นี่ !!!
+        const DATA_URL = 'https://docs.google.com/uc?export=download&id=1027XhlZFGXdC0SzYKHo-9umK1qm1igmD'; 
+
+        async function loadData() {
+            try {
+                const response = await fetch(DATA_URL); 
+                if (!response.ok) {
+                    throw new Error('ไม่สามารถเข้าถึงไฟล์ฐานข้อมูลได้ กรุณาตรวจสอบสิทธิ์การแชร์ของไฟล์ data.json');
+                }
+                
+                globalData = await response.json();
+                
+                searchInput.disabled = false;
+                searchInput.value = ''; 
+                renderTable(globalData);
+
+            } catch (error) {
+                console.error("Error loading data:", error);
+                tableBody.innerHTML = `<tr style="color:red;"><td colspan="4" style="text-align: center;">เกิดข้อผิดพลาดในการโหลดข้อมูล: ${error.message}</td></tr>`;
+            }
+        }
+
+        function renderTable(dataArray) {
+            let html = '';
+            if (dataArray.length === 0) {
+                html = '<tr><td colspan="4" style="text-align: center;">ไม่พบข้อมูลที่ตรงกับคำค้นหา</td></tr>';
+            } else {
+                dataArray.forEach(row => {
+                    // ใช้ชื่อคอลัมน์จากไฟล์ JSON
+                    const ยศ = row['ยศ'] || '';
+                    const ชื่อ = row['ชื่อ'] || '';
+                    const นามสกุล = row['นามสกุล'] || '';
+                    const ประเภท = row['ประเภท'] || '';
+
+                    html += `
+                        <tr>
+                            <td>${ยศ}</td>
+                            <td>${ชื่อ}</td>
+                            <td>${นามสกุล}</td>
+                            <td>${ประเภท}</td>
+                        </tr>
+                    `;
+                });
+            }
+            tableBody.innerHTML = html;
+        }
+
+        function filterTable() {
+            const filter = searchInput.value.toUpperCase().trim();
+            
+            if (filter === "") {
+                renderTable(globalData);
+                return;
+            }
+
+            const filteredData = globalData.filter(row => {
+                const ชื่อ = (row['ชื่อ'] || '').toUpperCase();
+                const นามสกุล = (row['นามสกุล'] || '').toUpperCase();
+                
+                // ค้นหาในคอลัมน์ ชื่อ หรือ นามสกุล
+                return ชื่อ.includes(filter) || นามสกุล.includes(filter);
+            });
+
+            renderTable(filteredData);
+        }
+
+        searchInput.disabled = true;
+        window.onload = loadData; 
+    </script>
+
+</body>
+</html>
