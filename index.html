@@ -3,16 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบค้นหาข้อมูลสมาชิก ศพก.ทบ.รามอินทรา (ผ่าน Google Drive)</title>
+    <title>ระบบค้นหาข้อมูลสมาชิก ศพก.ทบ.รามอินทรา</title>
     <style>
-        body { font-family: Tahoma, sans-serif; margin: 20px; background-color: #f4f4f4; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 20px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); border-radius: 8px; }
-        h1 { text-align: center; color: #333; }
-        #searchInput { width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; box-sizing: border-box; }
-        #resultTable { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        #resultTable th, #resultTable td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        #resultTable th { background-color: #007bff; color: white; }
-        #resultTable tr:nth-child(even) { background-color: #f9f9f9; }
+        /* โค้ด CSS สำหรับจัดรูปแบบ */
+        body { 
+            font-family: Tahoma, sans-serif; 
+            margin: 20px; 
+            background-color: #f4f4f4; 
+        }
+        .container { 
+            max-width: 900px; 
+            margin: auto; 
+            background: white; 
+            padding: 20px; 
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+            border-radius: 8px; 
+        }
+        h1 { 
+            text-align: center; 
+            color: #333; 
+        }
+        #searchInput { 
+            width: 100%; 
+            padding: 10px; 
+            margin-bottom: 20px; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+            font-size: 16px; 
+            box-sizing: border-box; 
+        }
+        #resultTable { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px; 
+        }
+        #resultTable th, #resultTable td { 
+            border: 1px solid #ddd; 
+            padding: 10px; 
+            text-align: left; 
+        }
+        #resultTable th { 
+            background-color: #007bff; 
+            color: white; 
+        }
+        #resultTable tr:nth-child(even) { 
+            background-color: #f9f9f9; 
+        }
     </style>
 </head>
 <body>
@@ -32,7 +68,7 @@
                 </tr>
             </thead>
             <tbody id="tableBody">
-                <tr><td colspan="4" style="text-align: center;">กำลังโหลดข้อมูลจาก Google Drive...</td></tr>
+                <tr><td colspan="4" style="text-align: center;">กำลังโหลดข้อมูลจาก Google Sheet...</td></tr>
             </tbody>
         </table>
     </div>
@@ -42,25 +78,53 @@
         const tableBody = document.getElementById('tableBody');
         let globalData = []; 
 
-        // !!! สำคัญ: ต้องใส่ URL สาธารณะของไฟล์ data.json ที่นี่ !!!
-        const DATA_URL = 'https://docs.google.com/uc?export=download&id=1027XhlZFGXdC0SzYKHo-9umK1qm1igmD'; 
+        // =======================================================
+        // การตั้งค่า Google Sheet
+        // Sheet ID ที่ดึงมาจาก URL: 1_elXS8HVYbG699CGxTVLrBqvEdweLHPIe3GI9Oe_bZ4
+        // =======================================================
+        const SHEET_ID = '1_elXS8HVYbG699CGxTVLrBqvEdweLHPIe3GI9Oe_bZ4'; 
+        
+        // ใช้ Google Visualization Query API สำหรับดึงข้อมูลตารางดิบ
+        const DATA_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`; 
 
         async function loadData() {
             try {
+                // 1. ดึงข้อมูล
                 const response = await fetch(DATA_URL); 
+                
                 if (!response.ok) {
-                    throw new Error('ไม่สามารถเข้าถึงไฟล์ฐานข้อมูลได้ กรุณาตรวจสอบสิทธิ์การแชร์ของไฟล์ data.json');
+                    throw new Error('การเชื่อมต่อกับ Google Sheets ล้มเหลว');
                 }
                 
-                globalData = await response.json();
+                // 2. แยก JSON ออกจาก String ที่ถูกห่อหุ้ม
+                const text = await response.text();
+                // Find the beginning and end of the JSON data
+                const jsonText = text.substring(text.indexOf('(') + 1, text.lastIndexOf(')'));
+                const dataObject = JSON.parse(jsonText);
+                const dataRows = dataObject.table.rows;
                 
+                // 3. แปลงข้อมูลแถวให้เป็น Array of Objects
+                globalData = dataRows.map(row => {
+                    // C[0] = ยศ, C[1] = ชื่อ, C[2] = นามสกุล, C[3] = ประเภท
+                    const ยศ = row.c[0]?.v || ''; 
+                    const ชื่อ = row.c[1]?.v || ''; 
+                    const นามสกุล = row.c[2]?.v || ''; 
+                    const ประเภท = row.c[3]?.v || ''; 
+                    
+                    if (ชื่อ && นามสกุล) {
+                        return { 'ยศ': ยศ, 'ชื่อ': ชื่อ, 'นามสกุล': นามสกุล, 'ประเภท': ประเภท };
+                    }
+                    return null;
+                }).filter(item => item !== null); 
+                
+                // 4. แสดงผลสำเร็จ
                 searchInput.disabled = false;
                 searchInput.value = ''; 
                 renderTable(globalData);
 
             } catch (error) {
                 console.error("Error loading data:", error);
-                tableBody.innerHTML = `<tr style="color:red;"><td colspan="4" style="text-align: center;">เกิดข้อผิดพลาดในการโหลดข้อมูล: ${error.message}</td></tr>`;
+                tableBody.innerHTML = `<tr style="color:red;"><td colspan="4" style="text-align: center;">เกิดข้อผิดพลาดในการโหลดข้อมูล: ${error.message} <br>ตรวจสอบ: 1. Sheet ID 2. การ "เผยแพร่ไปยังเว็บ" </td></tr>`;
             }
         }
 
@@ -70,7 +134,6 @@
                 html = '<tr><td colspan="4" style="text-align: center;">ไม่พบข้อมูลที่ตรงกับคำค้นหา</td></tr>';
             } else {
                 dataArray.forEach(row => {
-                    // ใช้ชื่อคอลัมน์จากไฟล์ JSON
                     const ยศ = row['ยศ'] || '';
                     const ชื่อ = row['ชื่อ'] || '';
                     const นามสกุล = row['นามสกุล'] || '';
