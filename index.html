@@ -2,14 +2,15 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <title>ระบบค้นหาข้อมูลสมาชิก ศพก.ทบ.รามอินทรา</title>
     <style>
-        /* โค้ด CSS สำหรับจัดรูปแบบ */
+        /* CSS หลักสำหรับ PC */
         body { 
-            font-family: Tahoma, sans-serif; 
+            font-family: 'Tahoma', sans-serif; /* ปรับปรุงฟอนต์ */
             margin: 20px; 
             background-color: #f4f4f4; 
+            box-sizing: border-box; /* ทำให้การคำนวณขนาดง่ายขึ้น */
         }
         .container { 
             max-width: 900px; 
@@ -25,22 +26,32 @@
         }
         #searchInput { 
             width: 100%; 
-            padding: 10px; 
+            padding: 12px; /* เพิ่ม Padding */
             margin-bottom: 20px; 
             border: 1px solid #ccc; 
             border-radius: 4px; 
             font-size: 16px; 
             box-sizing: border-box; 
         }
+
+        /* ---------------------------------------------------- */
+        /* การปรับตารางให้รองรับ Responsive */
+        /* ---------------------------------------------------- */
+        .table-responsive {
+            overflow-x: auto; /* ทำให้ตารางเลื่อนได้ในแนวนอนสำหรับมือถือ */
+            margin-top: 20px;
+        }
+
         #resultTable { 
             width: 100%; 
+            min-width: 500px; /* กำหนดความกว้างขั้นต่ำ เพื่อให้เลื่อนดูได้บนมือถือ */
             border-collapse: collapse; 
-            margin-top: 20px; 
         }
         #resultTable th, #resultTable td { 
             border: 1px solid #ddd; 
             padding: 10px; 
             text-align: left; 
+            white-space: nowrap; /* ป้องกันข้อความในเซลล์ยาวๆ ไม่ให้ตัดบรรทัด */
         }
         #resultTable th { 
             background-color: #007bff; 
@@ -49,6 +60,33 @@
         #resultTable tr:nth-child(even) { 
             background-color: #f9f9f9; 
         }
+        
+        /* ---------------------------------------------------- */
+        /* Media Query สำหรับ Smart Phone (หน้าจอแคบกว่า 600px) */
+        /* ---------------------------------------------------- */
+        @media (max-width: 600px) {
+            body {
+                margin: 0; /* ลบ Margin ออกเพื่อใช้พื้นที่เต็มที่บนมือถือ */
+            }
+            .container { 
+                margin: 0; /* ลบ Margin ออก */
+                padding: 10px; /* ลด Padding */
+                border-radius: 0;
+                box-shadow: none; /* ลบเงาออก */
+            }
+            h1 { 
+                font-size: 1.5em; /* ลดขนาดหัวข้อ */
+            }
+            #searchInput { 
+                padding: 10px;
+                font-size: 14px;
+            }
+            #resultTable th, #resultTable td { 
+                padding: 8px; /* ลด Padding ในตาราง */
+                font-size: 14px; /* ลดขนาดตัวอักษรในตาราง */
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -58,19 +96,21 @@
         
         <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="ค้นหา ชื่อ หรือ นามสกุล..." disabled>
 
-        <table id="resultTable">
-            <thead>
-                <tr>
-                    <th>ยศ</th>
-                    <th>ชื่อ</th>
-                    <th>นามสกุล</th>
-                    <th>ประเภท</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <tr><td colspan="4" style="text-align: center;">กำลังโหลดข้อมูลจาก Google Sheet...</td></tr>
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table id="resultTable">
+                <thead>
+                    <tr>
+                        <th>ยศ</th>
+                        <th>ชื่อ</th>
+                        <th>นามสกุล</th>
+                        <th>ประเภท</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr><td colspan="4" style="text-align: center;">กำลังโหลดข้อมูลจาก Google Sheet...</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
