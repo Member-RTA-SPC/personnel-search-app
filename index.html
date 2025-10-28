@@ -3,77 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบค้นหาข้อมูลสมาชิก ศพก.ทบ.รามอินทรา</title>
+    <title>ระบบค้นหาข้อมูลสมาชิก ศูนย์พัฒนากีฬากองทัพบก รามอินทรา</title>
     <style>
-        /* โค้ด CSS สำหรับจัดรูปแบบ */
+        /* CSS หลักสำหรับ PC */
         body { 
-            font-family: Tahoma, sans-serif; 
-            margin: 20px; 
-            background-color: #f4f4f4; 
+            font-family: 'Tahoma', sans-serif; /* เปลี่ยนฟอนต์ให้ดูดีขึ้น */
+            margin: 0; 
+            padding: 0;
+            background-color: #e9ecef; /* พื้นหลังสีอ่อน */
+            color: #343a40;
         }
         .container { 
-            max-width: 900px; 
-            margin: auto; 
+            max-width: 1000px; /* เพิ่มความกว้างสูงสุด */
+            margin: 20px auto; 
             background: white; 
-            padding: 20px; 
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-            border-radius: 8px; 
+            padding: 0 20px 20px 20px; /* ปรับ Padding */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+            border-radius: 12px; 
+        }
+
+        /* ส่วน Header */
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 3px solid #007bff;
+            margin-bottom: 20px;
+        }
+        .logo-img {
+            max-width: 150px; /* ขนาดโลโก้ */
+            height: auto;
+            margin-bottom: 15px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
         h1 { 
-            text-align: center; 
-            color: #333; 
+            font-size: 2em;
+            color: #007bff; /* สีน้ำเงินสว่าง */
+            margin: 0;
+            padding: 10px 0;
         }
+        .subheader {
+            font-size: 1.2em;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        /* ส่วน Search และตาราง */
         #searchInput { 
             width: 100%; 
-            padding: 10px; 
-            margin-bottom: 20px; 
-            border: 1px solid #ccc; 
-            border-radius: 4px; 
-            font-size: 16px; 
+            padding: 12px; 
+            margin-bottom: 25px; 
+            border: 2px solid #ced4da; 
+            border-radius: 6px; 
+            font-size: 18px; 
             box-sizing: border-box; 
+            transition: border-color 0.3s;
         }
+        #searchInput:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        
+        /* การจัดการตารางให้ Responsive */
+        .table-responsive {
+            overflow-x: auto; /* ทำให้ตารางเลื่อนได้ในแนวนอนสำหรับมือถือ */
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+
         #resultTable { 
             width: 100%; 
+            min-width: 500px; /* กำหนดความกว้างขั้นต่ำของตารางเมื่ออยู่บนมือถือ */
             border-collapse: collapse; 
-            margin-top: 20px; 
         }
         #resultTable th, #resultTable td { 
-            border: 1px solid #ddd; 
-            padding: 10px; 
+            border: 1px solid #dee2e6; 
+            padding: 12px; 
             text-align: left; 
+            font-size: 16px;
         }
         #resultTable th { 
             background-color: #007bff; 
             color: white; 
+            font-weight: bold;
+            text-transform: uppercase;
         }
         #resultTable tr:nth-child(even) { 
-            background-color: #f9f9f9; 
+            background-color: #f8f9fa; /* สีอ่อน */
+        }
+        #resultTable tr:hover { 
+            background-color: #e9ecef; /* มีผลเมื่อนำเมาส์ไปชี้ */
+        }
+
+        /* ส่วน Footer */
+        .footer {
+            text-align: center;
+            padding: 20px 0 10px 0;
+            border-top: 1px solid #ced4da;
+            margin-top: 30px;
+            color: #6c757d;
+        }
+        .footer-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Media Query สำหรับ Smart Phone (หน้าจอแคบกว่า 600px) */
+        @media (max-width: 600px) {
+            .container { 
+                margin: 0; 
+                padding: 10px;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            h1 { 
+                font-size: 1.5em; /* ลดขนาดหัวข้อ */
+            }
+            .subheader {
+                font-size: 1em;
+            }
+            #searchInput {
+                font-size: 16px;
+                padding: 10px;
+            }
+            #resultTable th, #resultTable td { 
+                padding: 8px; /* ลด Padding ตาราง */
+                font-size: 14px; /* ลดขนาดตัวอักษรในตาราง */
+            }
+            .logo-img {
+                max-width: 100px; /* ลดขนาดโลโก้บนมือถือ */
+            }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>ระบบค้นหาข้อมูลสมาชิก ศพก.ทบ.รามอินทรา</h1>
         
+        <div class="header">
+            <img src="data:image/jpeg;base64,[[logo.jpg_base64_encoded_data]]" alt="ตราสัญลักษณ์ ศพก.ทบ.รามอินทรา" class="logo-img">
+            <h1>ระบบค้นหาข้อมูลสมาชิก</h1>
+            <p class="subheader">ศูนย์พัฒนากีฬากองทัพบก รามอินทรา (Royal Thai Army Sport Center Ramindra Golf Course)</p>
+            <img src="data:image/jpeg;base64,[[136378_0.jpg_base64_encoded_data]]" alt="สนามกอล์ฟ กองทัพบก รามอินทรา" class="footer-image" style="max-width: 90%; margin-top: 15px;">
+        </div>
+
         <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="ค้นหา ชื่อ หรือ นามสกุล..." disabled>
 
-        <table id="resultTable">
-            <thead>
-                <tr>
-                    <th>ยศ</th>
-                    <th>ชื่อ</th>
-                    <th>นามสกุล</th>
-                    <th>ประเภท</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <tr><td colspan="4" style="text-align: center;">กำลังโหลดข้อมูลจาก Google Sheet...</td></tr>
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table id="resultTable">
+                <thead>
+                    <tr>
+                        <th>ยศ</th>
+                        <th>ชื่อ</th>
+                        <th>นามสกุล</th>
+                        <th>ประเภท</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr><td colspan="4" style="text-align: center;">กำลังโหลดข้อมูลจาก Google Sheet...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; 2024 Army Golf Club Ramindra. All Rights Reserved.</p>
+            <img src="data:image/jpeg;base64,[[136377_0.jpg_base64_encoded_data]]" alt="ลูกกอล์ฟ Army Driving Range" class="footer-image" style="max-width: 250px;">
+        </div>
     </div>
 
     <script>
+        // โค้ด JavaScript ทั้งหมดตั้งแต่ 'const searchInput' จนถึง 'window.onload = loadData;' 
+        // ยังคงเดิมตามที่ท่านได้ให้มา ไม่มีส่วนใดที่ต้องปรับเปลี่ยนเพื่อให้รองรับ Responsive
+        
         const searchInput = document.getElementById('searchInput');
         const tableBody = document.getElementById('tableBody');
         let globalData = []; 
