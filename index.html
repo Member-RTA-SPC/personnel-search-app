@@ -5,17 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <title>ระบบค้นหาข้อมูลสมาชิก ศูนย์พัฒนากีฬากองทัพบก รามอินทรา</title>
     <style>
-        /* CSS หลักสำหรับ PC */
+        /* ------------------------------------------------------------------ */
+        /* CSS หลัก: การตั้งค่าพื้นฐานสำหรับ PC และ Web Browser ทั่วไป */
+        /* ------------------------------------------------------------------ */
         body { 
             font-family: 'Tahoma', sans-serif;
-            margin: 0; /* แก้เป็น 0 เพื่อให้ใช้พื้นที่เต็มหน้าจอ */
+            margin: 0; 
             padding: 0; 
-            background-color: #e9ecef; /* ปรับพื้นหลังให้ดูดีขึ้น */
+            background-color: #e9ecef;
             color: #343a40;
-            box-sizing: border-box; 
+            box-sizing: border-box; /* ทำให้การคำนวณความกว้างรวม Padding/Border ง่ายขึ้น */
         }
         .container { 
-            max-width: 1000px; /* เพิ่มความกว้างสูงสุด */
+            max-width: 1000px;
             margin: 20px auto; 
             background: white; 
             padding: 0 20px 20px 20px;
@@ -30,30 +32,13 @@
             border-bottom: 3px solid #007bff;
             margin-bottom: 20px;
         }
-        .logo-img {
-            max-width: 150px; /* ขนาดโลโก้ */
-            height: auto;
-            margin-bottom: 15px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            border-radius: 50%;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        .sign-img {
-            max-width: 90%;
-            height: auto;
-            margin-top: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
+        /* ลบสไตล์ที่ไม่จำเป็นสำหรับรูปภาพที่ถูก comment ไว้ */
         h1 { 
             font-size: 2em;
             color: #007bff;
             margin: 0;
             padding: 10px 0 0;
         }
-        /* คลาสใหม่สำหรับข้อความภาษาอังกฤษ */
         .subheader {
             font-size: 1.2em;
             color: #6c757d;
@@ -69,24 +54,29 @@
             border-radius: 6px; 
             font-size: 18px; 
             box-sizing: border-box; 
+            transition: border-color 0.3s; /* เพิ่ม Transition เพื่อความสวยงาม */
         }
-        
+        #searchInput:focus {
+            border-color: #0056b3; /* เปลี่ยนสีเมื่อโฟกัส */
+            outline: none;
+        }
+
         /* การปรับตารางให้รองรับ Responsive */
         .table-responsive {
-            overflow-x: auto; /* ทำให้ตารางเลื่อนได้ในแนวนอนสำหรับมือถือ */
-            margin-bottom: 20px; /* ปรับจาก margin-top: 20px; เป็น margin-bottom: 20px; */
+            overflow-x: auto; 
+            margin-bottom: 20px;
             border: 1px solid #ddd;
             border-radius: 6px;
         }
 
         #resultTable { 
             width: 100%; 
-            min-width: 600px; /* กำหนดความกว้างขั้นต่ำ เพื่อให้เลื่อนดูได้บนมือถือ */
+            min-width: 600px; /* ความกว้างขั้นต่ำ เพื่อให้ดูดีบนมือถือ */
             border-collapse: collapse; 
         }
         #resultTable th, #resultTable td { 
             border: 1px solid #dee2e6; 
-            padding: 12px; /* เพิ่ม Padding ในตาราง */
+            padding: 12px; 
             text-align: left; 
             font-size: 16px;
             white-space: nowrap;
@@ -111,15 +101,10 @@
             margin-top: 30px;
             color: #6c757d;
         }
-        .golf-ball-img {
-            max-width: 250px;
-            height: auto;
-            border-radius: 8px;
-            margin: 10px 0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
 
+        /* ------------------------------------------------------------------ */
         /* Media Query สำหรับ Smart Phone (หน้าจอแคบกว่า 600px) */
+        /* ------------------------------------------------------------------ */
         @media (max-width: 600px) {
             body {
                 margin: 0;
@@ -131,7 +116,7 @@
                 box-shadow: none;
             }
             h1 { font-size: 1.5em; }
-            .subheader { font-size: 1em; } /* ปรับขนาด subheader บนมือถือ */
+            .subheader { font-size: 1em; }
             #searchInput { 
                 padding: 10px;
                 font-size: 14px;
@@ -153,7 +138,7 @@
 
             </div>
         
-        <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="ค้นหา ชื่อ หรือ นามสกุล..." disabled>
+        <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="ค้นหา ชื่อ ยศ หรือ นามสกุล..." disabled>
 
         <div class="table-responsive">
             <table id="resultTable">
@@ -257,11 +242,12 @@
             }
 
             const filteredData = globalData.filter(row => {
+                const ยศ = (row['ยศ'] || '').toUpperCase();
                 const ชื่อ = (row['ชื่อ'] || '').toUpperCase();
                 const นามสกุล = (row['นามสกุล'] || '').toUpperCase();
                 
-                // ค้นหาในคอลัมน์ ชื่อ หรือ นามสกุล
-                return ชื่อ.includes(filter) || นามสกุล.includes(filter);
+                // ค้นหาในคอลัมน์ ยศ, ชื่อ หรือ นามสกุล เพื่อความยืดหยุ่นในการค้นหา
+                return ยศ.includes(filter) || ชื่อ.includes(filter) || นามสกุล.includes(filter);
             });
 
             renderTable(filteredData);
