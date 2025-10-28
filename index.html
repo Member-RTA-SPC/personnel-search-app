@@ -3,96 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>ระบบค้นหาข้อมูลสมาชิก ศพก.ทบ.รามอินทรา</title>
+    <title>ระบบค้นหาข้อมูลสมาชิก ศูนย์พัฒนากีฬากองทัพบก รามอินทรา</title>
     <style>
         /* CSS หลักสำหรับ PC */
         body { 
-            font-family: 'Tahoma', sans-serif; /* ปรับปรุงฟอนต์ */
-            margin: 20px; 
-            background-color: #f4f4f4; 
-            box-sizing: border-box; /* ทำให้การคำนวณขนาดง่ายขึ้น */
-        }
-        .container { 
-            max-width: 900px; 
-            margin: auto; 
-            background: white; 
-            padding: 20px; 
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-            border-radius: 8px; 
-        }
-        h1 { 
-            text-align: center; 
-            color: #333; 
-        }
-        #searchInput { 
-            width: 100%; 
-            padding: 12px; /* เพิ่ม Padding */
-            margin-bottom: 20px; 
-            border: 1px solid #ccc; 
-            border-radius: 4px; 
-            font-size: 16px; 
+            font-family: 'Tahoma', sans-serif;
+            margin: 0; /* แก้เป็น 0 เพื่อให้ใช้พื้นที่เต็มหน้าจอ */
+            padding: 0; 
+            background-color: #e9ecef; /* ปรับพื้นหลังให้ดูดีขึ้น */
+            color: #343a40;
             box-sizing: border-box; 
         }
+        .container { 
+            max-width: 1000px; /* เพิ่มความกว้างสูงสุด */
+            margin: 20px auto; 
+            background: white; 
+            padding: 0 20px 20px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+            border-radius: 12px; 
+        }
 
-        /* ---------------------------------------------------- */
+        /* ส่วน Header */
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 3px solid #007bff;
+            margin-bottom: 20px;
+        }
+        .logo-img {
+            max-width: 150px; /* ขนาดโลโก้ */
+            height: auto;
+            margin-bottom: 15px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .sign-img {
+            max-width: 90%;
+            height: auto;
+            margin-top: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 { 
+            font-size: 2em;
+            color: #007bff;
+            margin: 0;
+            padding: 10px 0 0;
+        }
+        /* คลาสใหม่สำหรับข้อความภาษาอังกฤษ */
+        .subheader {
+            font-size: 1.2em;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        /* ส่วน Search และตาราง */
+        #searchInput { 
+            width: 100%; 
+            padding: 12px;
+            margin-bottom: 25px; 
+            border: 2px solid #ced4da; 
+            border-radius: 6px; 
+            font-size: 18px; 
+            box-sizing: border-box; 
+        }
+        
         /* การปรับตารางให้รองรับ Responsive */
-        /* ---------------------------------------------------- */
         .table-responsive {
             overflow-x: auto; /* ทำให้ตารางเลื่อนได้ในแนวนอนสำหรับมือถือ */
-            margin-top: 20px;
+            margin-bottom: 20px; /* ปรับจาก margin-top: 20px; เป็น margin-bottom: 20px; */
+            border: 1px solid #ddd;
+            border-radius: 6px;
         }
 
         #resultTable { 
             width: 100%; 
-            min-width: 500px; /* กำหนดความกว้างขั้นต่ำ เพื่อให้เลื่อนดูได้บนมือถือ */
+            min-width: 600px; /* กำหนดความกว้างขั้นต่ำ เพื่อให้เลื่อนดูได้บนมือถือ */
             border-collapse: collapse; 
         }
         #resultTable th, #resultTable td { 
-            border: 1px solid #ddd; 
-            padding: 10px; 
+            border: 1px solid #dee2e6; 
+            padding: 12px; /* เพิ่ม Padding ในตาราง */
             text-align: left; 
-            white-space: nowrap; /* ป้องกันข้อความในเซลล์ยาวๆ ไม่ให้ตัดบรรทัด */
+            font-size: 16px;
+            white-space: nowrap;
         }
         #resultTable th { 
             background-color: #007bff; 
             color: white; 
+            font-weight: bold;
         }
         #resultTable tr:nth-child(even) { 
-            background-color: #f9f9f9; 
+            background-color: #f8f9fa; 
         }
-        
-        /* ---------------------------------------------------- */
+        #resultTable tr:hover { 
+            background-color: #e9ecef;
+        }
+
+        /* ส่วน Footer */
+        .footer {
+            text-align: center;
+            padding: 20px 0 10px 0;
+            border-top: 1px solid #ced4da;
+            margin-top: 30px;
+            color: #6c757d;
+        }
+        .golf-ball-img {
+            max-width: 250px;
+            height: auto;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
         /* Media Query สำหรับ Smart Phone (หน้าจอแคบกว่า 600px) */
-        /* ---------------------------------------------------- */
         @media (max-width: 600px) {
             body {
-                margin: 0; /* ลบ Margin ออกเพื่อใช้พื้นที่เต็มที่บนมือถือ */
+                margin: 0;
             }
             .container { 
-                margin: 0; /* ลบ Margin ออก */
-                padding: 10px; /* ลด Padding */
+                margin: 0; 
+                padding: 10px;
                 border-radius: 0;
-                box-shadow: none; /* ลบเงาออก */
+                box-shadow: none;
             }
-            h1 { 
-                font-size: 1.5em; /* ลดขนาดหัวข้อ */
-            }
+            h1 { font-size: 1.5em; }
+            .subheader { font-size: 1em; } /* ปรับขนาด subheader บนมือถือ */
             #searchInput { 
                 padding: 10px;
                 font-size: 14px;
             }
             #resultTable th, #resultTable td { 
-                padding: 8px; /* ลด Padding ในตาราง */
-                font-size: 14px; /* ลดขนาดตัวอักษรในตาราง */
+                padding: 8px;
+                font-size: 14px;
             }
         }
-
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>ระบบค้นหาข้อมูลสมาชิก ศพก.ทบ.รามอินทรา</h1>
+        
+        <div class="header">
+            <h1>ระบบค้นหาข้อมูลสมาชิก ศพก.ทบ.รามอินทรา</h1>
+            <p class="subheader">(Royal Thai Army Sport Center Ramindra Golf Course)</p>
+
+            </div>
         
         <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="ค้นหา ชื่อ หรือ นามสกุล..." disabled>
 
@@ -111,6 +170,10 @@
                 </tbody>
             </table>
         </div>
+        
+        <div class="footer">
+            <p>&copy; 2024. All Rights Reserved.</p>
+            </div>
     </div>
 
     <script>
@@ -120,30 +183,24 @@
 
         // =======================================================
         // การตั้งค่า Google Sheet
-        // Sheet ID ที่ดึงมาจาก URL: 1_elXS8HVYbG699CGxTVLrBqvEdweLHPIe3GI9Oe_bZ4
         // =======================================================
         const SHEET_ID = '1_elXS8HVYbG699CGxTVLrBqvEdweLHPIe3GI9Oe_bZ4'; 
-        
-        // ใช้ Google Visualization Query API สำหรับดึงข้อมูลตารางดิบ
         const DATA_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`; 
 
         async function loadData() {
             try {
-                // 1. ดึงข้อมูล
                 const response = await fetch(DATA_URL); 
                 
                 if (!response.ok) {
                     throw new Error('การเชื่อมต่อกับ Google Sheets ล้มเหลว');
                 }
                 
-                // 2. แยก JSON ออกจาก String ที่ถูกห่อหุ้ม
                 const text = await response.text();
                 // Find the beginning and end of the JSON data
                 const jsonText = text.substring(text.indexOf('(') + 1, text.lastIndexOf(')'));
                 const dataObject = JSON.parse(jsonText);
                 const dataRows = dataObject.table.rows;
                 
-                // 3. แปลงข้อมูลแถวให้เป็น Array of Objects
                 globalData = dataRows.map(row => {
                     // C[0] = ยศ, C[1] = ชื่อ, C[2] = นามสกุล, C[3] = ประเภท
                     const ยศ = row.c[0]?.v || ''; 
@@ -157,7 +214,6 @@
                     return null;
                 }).filter(item => item !== null); 
                 
-                // 4. แสดงผลสำเร็จ
                 searchInput.disabled = false;
                 searchInput.value = ''; 
                 renderTable(globalData);
